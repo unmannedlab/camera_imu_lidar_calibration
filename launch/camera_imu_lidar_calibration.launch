@@ -1,0 +1,132 @@
+<launch>
+
+    <!-- MASTER NODE! -->
+    <node name="ros_test_camera_imu_lidar_calibration_node" pkg="camera_imu_lidar_calibration" type="ros_test_camera_imu_lidar_calibration_node"
+    output="screen" clear_params="true" required="true">
+<!--        <node name="run_serial_msckf" pkg="ov_msckf" type="run_serial_msckf" output="screen" clear_params="true" required="true" launch-prefix="gdb -ex run &#45;&#45;args">-->
+        <!-- bag topics -->
+        <param name="topic_imu"    type="string" value="/vectornav/IMU" />
+        <param name="topic_lidar"  type="string" value="/os_cloud_node/points" />
+        <param name="topic_camera"  type="string" value="/pylon_camera_node/image_raw" />
+
+        <!-- bag parameters -->
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-06-51.bag"/> -->
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-11-20.bag"/> -->
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-15-06.bag"/> -->
+        <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-20-21.bag"/>
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-30-47.bag"/> -->
+
+<!--         <param name="path_bag"    type="string" value="/home/usl/Downloads/2021-04-16-10-32-05_far.bag" /> -->
+
+        <param name="bag_start"   type="double" value="0.0" />
+        <param name="bag_durr"    type="int"    value="-1" />
+
+        <!-- Estimator Parameters -->
+        <param name="use_fej" type="bool" value="false" />
+        <param name="use_imuavg" type="bool" value="true" />
+        <param name="use_rk4int" type="bool" value="true" />
+        <param name="do_calib_lidar_imu_timeoffset" type="bool" value="false" />
+        <param name="do_calib_lidar_imu_extrinsic"   type="bool"   value="true" />
+        <param name="do_calib_camera_imu_timeoffset" type="bool" value="false" />
+        <param name="do_calib_camera_imu_extrinsic"   type="bool"   value="true" />
+        <param name="max_clones" type="int" value="25" /> <!-- 4 is the min number of clones we need atm -->
+        <param name="updater_do_chi2_check" type="bool" value="true"/>
+
+        <!-- Filter Init Parameters -->
+        <param name="init_window_time" type="double" value="0.25"/> <!-- in second -->
+        <param name="init_imu_thresh" type="double" value="0.25"/> <!-- jerk threshold -->
+
+        <!-- Noise Parameters -->
+<!--         <param name="accelerometer_noise_density"  type="double"   value="0.094666" /> -->
+<!--         <param name="accelerometer_random_walk"    type="double"   value="0.278617" /> -->
+<!--         <param name="gyroscope_noise_density"      type="double"   value="0.00006243" /> -->
+<!--         <param name="gyroscope_random_walk"        type="double"   value="0.00000046" /> -->
+
+        <param name="accelerometer_noise_density"  type="double"   value="0.0015825749257056074" />
+        <param name="accelerometer_random_walk"    type="double"   value="4.1557212532459854e-05" />
+        <param name="gyroscope_noise_density"      type="double"   value="8.97991030686202e-05" />
+        <param name="gyroscope_random_walk"        type="double"   value="7.253101866424753e-07" />
+
+        <!-- Updater Parameters -->
+        <!-- Chi2 Parameters -->
+        <param name="updater_chi2_multiplier" type="int" value="1" />
+        <!-- Update Noise (sigma) Params -->
+        <param name="updater_rotation_noise" type="double" value="0.1" />
+        <param name="updater_translation_noise" type="double" value="0.1" />
+        <param name="updater_pixel_noise" type="double" value="0.1" />
+
+        <!-- State Initial Noise (sigma) Params -->
+        <!-- Lidar IMU Calib-->
+        <param name="state_init_trans_x_noise_lidarimu" type="double" value="0.5" />
+        <param name="state_init_trans_y_noise_lidarimu" type="double" value="0.5" />
+        <param name="state_init_trans_z_noise_lidarimu" type="double" value="0.5" />
+        <param name="state_init_rot_x_noise_lidarimu" type="double" value="0.1" />
+        <param name="state_init_rot_y_noise_lidarimu" type="double" value="0.1" />
+        <param name="state_init_rot_z_noise_lidarimu" type="double" value="0.1" />
+        <param name="state_init_time_offset_noise_lidarimu" type="double" value="0.01" />
+
+        <!-- Camera IMU Calib-->
+        <param name="state_init_trans_x_noise_cameraimu" type="double" value="0.5" />
+        <param name="state_init_trans_y_noise_cameraimu" type="double" value="0.5" />
+        <param name="state_init_trans_z_noise_cameraimu" type="double" value="0.5" />
+        <param name="state_init_rot_x_noise_cameraimu" type="double" value="0.5" />
+        <param name="state_init_rot_y_noise_cameraimu" type="double" value="0.5" />
+        <param name="state_init_rot_z_noise_cameraimu" type="double" value="0.5" />
+        <param name="state_init_time_offset_noise_cameraimu" type="double" value="0.01" />
+
+        <!-- Gravity -->
+        <rosparam param="gravity">[0.0, 0.0, 9.81]</rosparam>
+
+        <!-- initialization of lidar imu time offset -->
+        <param name="calib_lidar_imu_dt" type="double" value="0.0" />
+        <param name="calib_camera_imu_dt" type="double" value="0.0" />
+
+        <!-- params determining map size -->
+        <param name="limit_map_size" type="bool" value="false"/>
+        <param name="no_of_scans_for_map" type="int" value="400"/>
+
+        <!-- params for downsampling clouds before mapping -->
+        <param name="downsample_for_mapping" type="bool" value="false"/>
+
+        <!-- initial calibration file -->
+        <param name="init_lidar_inertial_calibration_result_filename" type="string" value="$(find camera_imu_lidar_calibration)/data/I_T_L_init.txt"/>
+        <param name="init_camera_inertial_calibration_result_filename" type="string" value="$(find camera_imu_lidar_calibration)/data/I_T_C_init.txt"/>
+
+        <!-- output filenames -->
+        <param name="inertial_trajectory_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/imu_trajectory.csv"/>
+        <param name="inertial_bias_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/imu_bias.csv"/>
+        <param name="inertial_velocity_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/imu_velocity.csv"/>
+        <param name="lidar_inertial_calib_extrinsic_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/lidar_imu_calib_extrinsics.csv"/>
+        <param name="lidar_inertial_calib_dt_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/lidar_imu_calib_dt.csv"/>
+        <param name="visual_inertial_calib_extrinsic_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/camera_imu_calib_extrinsics.csv"/>
+        <param name="visual_inertial_calib_dt_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/camera_imu_calib_dt.csv"/>
+
+        <param name="lidar_odometry_trajectory_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/lo_trajectory.csv"/>
+
+        <!-- NDT Resolution -->
+        <param name="ndt_resolution" type="double" value="0.25"/>
+
+        <!-- Camera Tracking Parameters -->
+        <param name="checkerboard_dx" type="double" value="0.0715"/>
+        <param name="checkerboard_dy" type="double" value="0.0715"/>
+        <param name="checkerboard_rows" type="int" value="6"/>
+        <param name="checkerboard_cols" type="int" value="7"/>
+        <param name="camera_calibration_file_path" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/pylon_calib.yaml"/>
+
+        <!-- Undistortion flag-->
+        <param name="do_undistortion" type="bool" value="true" />
+
+        <!-- Do planar update -->
+        <param name="do_planar_update" type="bool" value="false"/>
+
+        <!-- Write outputs -->
+        <param name="lidar_inertial_calibration_result_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/I_T_L_final.txt"/>
+        <param name="camera_inertial_calibration_result_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/I_T_C_final.txt"/>
+        <param name="camera_lidar_calibration_result_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/C_T_L_final.txt"/>
+
+        <param name="gen_map_data" type="bool" value="false"/>
+        <param name="map_csv_file_name" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/map.csv"/>
+
+    </node>
+
+</launch>

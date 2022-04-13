@@ -1,0 +1,22 @@
+<launch>
+
+    <!-- MASTER NODE! -->
+    <node name="ros_camera_imu_lidar_calibration_bag_generator_node" pkg="camera_imu_lidar_calibration" type="ros_camera_imu_lidar_calibration_bag_generator_node"
+    output="screen" clear_params="true" required="true">
+<!--        <node name="run_serial_msckf" pkg="ov_msckf" type="run_serial_msckf" output="screen" clear_params="true" required="true" launch-prefix="gdb -ex run &#45;&#45;args">-->
+        <!-- bag topics -->
+        <param name="topic_imu"    type="string" value="/vectornav/IMU" />
+        <param name="topic_lidar"  type="string" value="/os_cloud_node/points" />
+        <param name="topic_camera"  type="string" value="/pylon_camera_node/image_raw" />
+
+        <!-- bag parameters -->
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-06-51.bag"/> -->
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-11-20.bag"/> -->
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-15-06.bag"/> -->
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-20-21.bag"/> -->
+        <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-30-47.bag"/>
+        <param name = "path_out_bag" type="string" value="/home/usl/Downloads/2022-01-28-15-30-47-out.bag"/>
+
+    </node>
+
+</launch>
