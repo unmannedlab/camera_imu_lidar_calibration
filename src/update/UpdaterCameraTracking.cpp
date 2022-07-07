@@ -234,8 +234,7 @@ double UpdaterCameraTracking::updatePixelBased(State *current_state, Eigen::Matr
     }
 
     Eigen::Matrix<double, 3, 3> C_R_B_hat = R_c_hat.transpose() * Ik_R_G_hat * I0_R_G_hat.transpose() * R_c_hat;
-    Eigen::Matrix<double, 3, 1> C_p_B_hat = R_c_hat.transpose() * ((Ik_R_G_hat * I0_R_G_hat.transpose() - Eigen::Matrix3d::Identity()) * p_c_hat
-                                                                   + Ik_R_G_hat * (G_p_I0_hat - G_p_Ik_hat));
+    Eigen::Matrix<double, 3, 1> C_p_B_hat = R_c_hat.transpose() * ((Ik_R_G_hat * I0_R_G_hat.transpose() - Eigen::Matrix3d::Identity()) * p_c_hat + Ik_R_G_hat * (G_p_I0_hat - G_p_Ik_hat));
 
     /// Jacobian with respect to Extrinsic Calibration
     Eigen::Matrix<double, 3, 3> cRb_H_Rc = R_c_hat.transpose() * (Ik_R_G_hat * I0_R_G_hat.transpose() - Eigen::Matrix3d::Identity());

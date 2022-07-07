@@ -5,7 +5,7 @@
 #include "UpdaterCameraLidarConstraint.h"
 
 using namespace calib_core;
-void calib_estimator::UpdaterCameraLidarConstraint::updatePlaneToPlaneConstraint(State *current_state,
+double calib_estimator::UpdaterCameraLidarConstraint::updatePlaneToPlaneConstraint(State *current_state,
                                                                                  Eigen::Vector4d nd_c, double timestamp_camera,
                                                                                  Eigen::Vector4d nd_l, double timestamp_lidar,
                                                                                  bool &did_update) {
@@ -83,11 +83,17 @@ void calib_estimator::UpdaterCameraLidarConstraint::updatePlaneToPlaneConstraint
     Eigen::MatrixXd H_rR_IRC = I_R_C.transpose()* skew_x(Ij_R_G*Ii_R_G.transpose()*I_R_L*n_l);
     Eigen::MatrixXd H_rR_IRL = -I_R_C.transpose()*Ij_R_G*Ii_R_G.transpose()* skew_x(I_R_L*n_l);
 
-    Eigen::MatrixXd H_CjpLi_IiRG = -I_R_C.transpose()*Ij_R_G*Ii_R_G.transpose()*skew_x(I_p_L); Eigen::MatrixXd H_CjpLi_GpIi = Eigen::Matrix3d::Identity();
-    Eigen::MatrixXd H_CjpLi_IjRG = I_R_C.transpose() * skew_x(Ij_R_G * (Ii_R_G.transpose() * I_p_L + G_p_Ii - G_p_Ij)); Eigen::MatrixXd H_CjpLi_GpIj = Eigen::Matrix3d::Identity();
+    Eigen::MatrixXd H_CjpLi_IiRG = -I_R_C.transpose()*Ij_R_G*Ii_R_G.transpose()*skew_x(I_p_L);
+    Eigen::MatrixXd H_CjpLi_GpIi = Eigen::Matrix3d::Identity();
 
-    Eigen::MatrixXd H_CjpLi_IRC = -I_R_C.transpose() * skew_x(Ij_R_G * (Ii_R_G.transpose() * I_p_L + G_p_Ii - G_p_Ij)); Eigen::MatrixXd H_CjpLi_IpC = -I_R_C.transpose();
-    Eigen::MatrixXd H_CjpLi_IRL = I_R_C.transpose()*Ij_R_G*Ii_R_G.transpose()*skew_x(I_p_L); Eigen::MatrixXd H_CjpLi_IpL = I_R_C.transpose()*Ij_R_G*Ii_R_G.transpose();
+    Eigen::MatrixXd H_CjpLi_IjRG = I_R_C.transpose() * skew_x(Ij_R_G * (Ii_R_G.transpose() * I_p_L + G_p_Ii - G_p_Ij));
+    Eigen::MatrixXd H_CjpLi_GpIj = Eigen::Matrix3d::Identity();
+
+    Eigen::MatrixXd H_CjpLi_IRC = -I_R_C.transpose() * skew_x(Ij_R_G * (Ii_R_G.transpose() * I_p_L + G_p_Ii - G_p_Ij));
+    Eigen::MatrixXd H_CjpLi_IpC = -I_R_C.transpose();
+
+    Eigen::MatrixXd H_CjpLi_IRL = I_R_C.transpose()*Ij_R_G*Ii_R_G.transpose()*skew_x(I_p_L);
+    Eigen::MatrixXd H_CjpLi_IpL = I_R_C.transpose()*Ij_R_G*Ii_R_G.transpose();
 
     Eigen::MatrixXd H_rP_IiRG = n_c.transpose()*H_CjpLi_IiRG; Eigen::MatrixXd H_rP_GpIi = n_c.transpose()*H_CjpLi_GpIi;
     Eigen::MatrixXd H_rP_IjRG = n_c.transpose() * H_CjpLi_IjRG; Eigen::MatrixXd H_rP_GpIj = n_c.transpose() * H_CjpLi_GpIj;
@@ -106,12 +112,6 @@ void calib_estimator::UpdaterCameraLidarConstraint::updatePlaneToPlaneConstraint
     H_x.block(3, 12, 1, 3) = -H_rP_IRL; H_x.block(3, 15, 1, 3) = -H_rP_IpL;
     H_x.block(3, 18, 1, 3) = -H_rP_IRC; H_x.block(3, 21, 1, 3) = -H_rP_IpC;
 
-
-//    H_x.block(0, 0, 3, 3) = -H_rR_IRL; H_x.block(0, 3, 3, 3) = Eigen::Matrix3d::Zero();
-//    H_x.block(0, 6, 3, 3) = -H_rR_IRC; H_x.block(0, 9, 3, 3) = Eigen::Matrix3d::Zero();
-//    H_x.block(3, 0, 1, 3) = -H_rP_IRL; H_x.block(3, 3, 1, 3) = -H_rP_IpL;
-//    H_x.block(3, 6, 1, 3) = -H_rP_IRC; H_x.block(3, 9, 1, 3) = -H_rP_IpC;
-
     Eigen::Matrix3d R_rot = std::pow(0.05, 2)*Eigen::Matrix3d::Identity();
     double R_trans = std::pow(0.05, 2);
 
@@ -123,7 +123,6 @@ void calib_estimator::UpdaterCameraLidarConstraint::updatePlaneToPlaneConstraint
     Eigen::MatrixXd P = StateHelper::get_marginal_covariance(current_state, x_order);
     Eigen::MatrixXd S = H_x * P * H_x.transpose() + R;
     double chi2 = res.dot(S.llt().solve(res));
-
     boost::math::chi_squared chi_squared_dist(4); // I know res.rows() is 4
     double chi2_check = boost::math::quantile(chi_squared_dist, 0.95);
     if(_options.do_chi2_check) {
@@ -137,6 +136,7 @@ void calib_estimator::UpdaterCameraLidarConstraint::updatePlaneToPlaneConstraint
             did_update = true;
         }
     }
+    return res.norm();
 }
 
 void calib_estimator::UpdaterCameraLidarConstraint::updatePlaneToPlaneConstraint(State *current_state,

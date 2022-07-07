@@ -11,10 +11,10 @@
 
         <!-- bag parameters -->
 <!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-06-51.bag"/> -->
-<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-11-20.bag"/> -->
+        <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-11-20.bag"/>
 <!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-15-06.bag"/> -->
 <!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-20-21.bag"/> -->
-        <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-30-47.bag"/>
+<!--         <param name = "path_bag" type="string" value="/media/usl/Untitled/Subodh/usl-data/camera_imu_lidar/2022-01-28-15-30-47.bag"/> -->
 
 <!--         <param name="path_bag"    type="string" value="/home/usl/Downloads/2021-04-16-10-32-05_far.bag" /> -->
 
@@ -26,8 +26,8 @@
         <param name="use_imuavg" type="bool" value="true" />
         <param name="use_rk4int" type="bool" value="true" />
         <param name="do_calib_lidar_imu_timeoffset" type="bool" value="false" />
-        <param name="do_calib_lidar_imu_extrinsic"   type="bool"   value="true" />
         <param name="do_calib_camera_imu_timeoffset" type="bool" value="false" />
+        <param name="do_calib_lidar_imu_extrinsic"   type="bool"   value="true" />
         <param name="do_calib_camera_imu_extrinsic"   type="bool"   value="true" />
         <param name="max_clones" type="int" value="25" /> <!-- 4 is the min number of clones we need atm -->
         <param name="updater_do_chi2_check" type="bool" value="true"/>
@@ -102,6 +102,7 @@
         <param name="visual_inertial_calib_dt_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/camera_imu_calib_dt.csv"/>
 
         <param name="lidar_odometry_trajectory_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/lo_trajectory.csv"/>
+        <param name="residual_filename" type="string" value="/home/usl/catkin_ws/src/camera_imu_lidar_calibration/data/residual_cameraimulidar.csv"/>
 
         <!-- NDT Resolution -->
         <param name="ndt_resolution" type="double" value="0.25"/>

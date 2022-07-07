@@ -31,7 +31,7 @@ namespace calib_estimator {
         }
 
         /// Given plane measurement from both camera and lidar, estimate the state
-        void updatePlaneToPlaneConstraint(State *current_state,
+        double updatePlaneToPlaneConstraint(State *current_state,
                                             Eigen::Vector4d nd_c, double timestamp_camera,
                                             Eigen::Vector4d nd_l, double timestamp_lidar,
                                             bool &did_update);

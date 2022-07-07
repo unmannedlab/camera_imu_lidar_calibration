@@ -245,6 +245,9 @@ namespace calib_estimator {
         nh.param("downsample_for_mapping", params.downSampleForMapping, params.downSampleForMapping);
         nh.param("gen_map_data", params.gen_map_data, params.gen_map_data);
 
+        /// Residual file name
+        nh.param("residual_filename", params.residual_filename, params.residual_filename);
+
         return params;
     }
 }

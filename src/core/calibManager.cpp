@@ -54,6 +54,7 @@ calib_estimator::calibManager::calibManager(calibManagerOptions& params_) {
     calib_lidar_imu_dt_csv.open(params.lidar_inertial_calib_dt_filename);
     calib_camera_imu_extrinsic_csv.open(params.visual_inertial_calib_extrinsic_filename);
     calib_camera_imu_dt_csv.open(params.visual_inertial_calib_dt_filename);
+    residual_filename_csv_writer.open(params.residual_filename);
 
     /// Create the state
     state = new State(params.state_options);
@@ -107,9 +108,11 @@ calib_estimator::calibManager::calibManager(calibManagerOptions& params_) {
 void calib_estimator::calibManager::projectLidarPointsOnImage() {
     if (calibration_board_points != nullptr && !image_measurement.empty()) {
         std::vector<cv::Point3f> object_points_L;
+        std::vector<double> object_points_intensities;
         for (int i = 0; i < calibration_board_points->points.size(); ++i) {
             cv::Point3f object_point_L = cv::Point3f (calibration_board_points->points[i].x,
                                                       calibration_board_points->points[i].y, calibration_board_points->points[i].z);
+            object_points_intensities.push_back(calibration_board_points->points[i].intensity);
             object_points_L.push_back(object_point_L);
         }
         Pose* I_calib_L = state->_calib_LIDARtoIMU;
@@ -150,7 +153,9 @@ void calib_estimator::calibManager::projectLidarPointsOnImage() {
         std::vector<cv::Point2f> projected_points;
         cv::projectPoints(object_points_L, rvec, tvec, K, D, projected_points, cv::noArray());
         for(int i = 0; i < projected_points.size(); i++) {
-            cv::circle(image_measurement, projected_points[i], 3, cv::Scalar(185, 185, 45), cv::FILLED, cv::LINE_4);
+            cv::circle(image_measurement, projected_points[i], 3, cv::Scalar(object_points_intensities[i],
+                                                                             object_points_intensities[i], object_points_intensities[i]),
+                       cv::FILLED, cv::LINE_4);
         }
 
         Eigen::Vector4d nd_l = nd_l_vector.at(timestamp_lidar);
@@ -536,7 +541,7 @@ void calib_estimator::calibManager::do_lidar_camera_update() {
 //        std::cout << BOLDCYAN << "nd_l size: " << nd_l_vector.size() << std::endl;
         bool do_update_lidar_camera1 = false;
         if(state->_clones_IMU.count(timestamp_camera) != 0 && state->_clones_IMU.count(timestamp_lidar) != 0) {
-            updaterCameraLidarConstraint->updatePlaneToPlaneConstraint(state,
+            residual_value = updaterCameraLidarConstraint->updatePlaneToPlaneConstraint(state,
                                                                        nd_c_vector.at(timestamp_camera).transpose(), timestamp_camera,
                                                                        nd_l_vector.at(timestamp_lidar).transpose(), timestamp_lidar,
                                                                        do_update_lidar_camera1);
@@ -624,5 +629,9 @@ void calib_estimator::calibManager::logData() {
     statevars_calib_camera2imu_dt.push_back(state->_calib_dt_CAMERAtoIMU);
     Eigen::Matrix<double, 1, 1> covariance_calib_camera2imu_dt = StateHelper::get_marginal_covariance(state, statevars_calib_camera2imu_dt);
     calib_camera_imu_dt_csv << state->_calib_dt_CAMERAtoIMU->value()(0) << ", " << sqrt(covariance_calib_camera2imu_dt(0, 0)) << std::endl;
+
+    ///
+    std::cout << "residual_value: " << residual_value << std::endl;
+    residual_filename_csv_writer << residual_value << std::endl;
 }
 

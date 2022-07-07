@@ -192,6 +192,7 @@ namespace calib_estimator {
         std::ofstream calib_lidar_imu_dt_csv;
         std::ofstream calib_camera_imu_extrinsic_csv;
         std::ofstream calib_camera_imu_dt_csv;
+        std::ofstream residual_filename_csv_writer;
 
         /// Raw Pointcloud
         TPointCloud raw_cloud;
@@ -232,6 +233,8 @@ namespace calib_estimator {
         int image_height;
         int image_width;
         cv::Mat K, D;
+
+        double residual_value = 0;
     };
 }
 #endif //CALIB_ESTIMATOR_CALIBMANAGER_H

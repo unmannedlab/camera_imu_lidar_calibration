@@ -141,6 +141,9 @@ namespace calib_estimator {
         /// camera lidar calibration result filename
         std::string camera_lidar_calibration_result_filename;
 
+        /// Residual
+        std::string residual_filename;
+
         /// Map size params
         bool limit_map_size = true;
         int no_of_scans_for_map = 100;
